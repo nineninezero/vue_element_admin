@@ -8,6 +8,14 @@ export function login(data) {
   })
 }
 
+export function func_qr_check(auth_id, tokenAdmin) {
+  return request({
+    url: 'zz_admin/index_qr/check',
+    method: 'post',
+    params: { auth_id, tokenAdmin }
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: '/vue-admin-template/user/info',

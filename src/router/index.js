@@ -32,8 +32,14 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
+    path: '/z_ui/a_admin/index',
+    component: () => import('@/views/z_ui/a_admin/index'),
+    hidden: true
+  },
+
+  {
+    path: '/z_ui/a_admin/index_qr',
+    component: () => import('@/views/z_ui/a_admin/index_qr'),
     hidden: true
   },
 

@@ -8,51 +8,55 @@ import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/login'] // no redirect whitelist
+const whiteList = ['/z_ui/a_admin/index'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
-  // start progress bar
+  // console.log('路由导航守卫：', to, from, next)
   NProgress.start()
 
-  // set page title
   document.title = getPageTitle(to.meta.title)
 
-  // determine whether the user has logged in
   const hasToken = getToken()
 
   if (hasToken) {
-    if (to.path === '/login') {
-      // if is logged in, redirect to the home page
+    console.log('存在token_login')
+    if (to.path === '/z_ui/a_admin/index') {
       next({ path: '/' })
       NProgress.done()
     } else {
-      const hasGetUserInfo = store.getters.name
-      if (hasGetUserInfo) {
+      if (to.path === '/z_ui/a_admin/index_qr') {
+        // 有token_login了可以去二维码页
         next()
-      } else {
-        try {
-          // get user info
-          await store.dispatch('user/getInfo')
-
-          next()
-        } catch (error) {
-          // remove token and go to login page to re-login
-          await store.dispatch('user/resetToken')
-          Message.error(error || 'Has Error')
-          next(`/login?redirect=${to.path}`)
-          NProgress.done()
-        }
+        return
       }
+      // （准备换成判断二维码token的）
+      // const hasGetUserInfo = store.getters.name
+      // if (hasGetUserInfo) {
+      //   next()
+      // } else {
+      //   try {
+      //     // get user info
+      //     await store.dispatch('user/getInfo')
+
+      //     next()
+      //   } catch (error) {
+      //     // remove token and go to login page to re-login
+      //     await store.dispatch('user/resetToken')
+      //     Message.error(error || 'Has Error')
+      //     next(`/z_ui/a_admin/index?redirect=${to.path}`)
+      //     NProgress.done()
+      //   }
+      // }
+      next()
     }
   } else {
-    /* has no token*/
+    console.log('未有token_login')
 
     if (whiteList.indexOf(to.path) !== -1) {
-      // in the free login whitelist, go directly
+      // 白名单直接跳
       next()
     } else {
-      // other pages that do not have permission to access are redirected to the login page.
-      next(`/login?redirect=${to.path}`)
+      next(`/z_ui/a_admin/index?redirect=${to.path}`)
       NProgress.done()
     }
   }

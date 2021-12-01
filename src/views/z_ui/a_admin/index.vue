@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">登录</h3>
       </div>
 
       <el-form-item prop="site_id">
@@ -56,7 +56,7 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">确认</el-button>
 
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -69,6 +69,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { Message } from 'element-ui'
 
 export default {
   name: 'Login',
@@ -134,8 +135,17 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+          this.$store.dispatch('user/login', this.loginForm).then((data) => {
+            if (data.errcode !== 0) {
+              Message({
+                message: data.errmsg || 'Error',
+                type: 'error',
+                duration: 5 * 1000
+              })
+            } else {
+              // this.$router.push({ path: this.redirect || '/' })
+              this.$router.push({ path: '/z_ui/a_admin/index_qr', query: { redirect: this.redirect }})
+            }
             this.loading = false
           }).catch(() => {
             this.loading = false
