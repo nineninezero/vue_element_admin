@@ -1,7 +1,13 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+      auto-complete="on"
+      label-position="left"
+    >
       <div class="title-container">
         <h3 class="title">登录</h3>
       </div>
@@ -52,17 +58,23 @@
           @keyup.enter.native="handleLogin"
         />
         <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          <svg-icon
+            :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'"
+          />
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">确认</el-button>
+      <el-button
+        :loading="loading"
+        type="primary"
+        style="width: 100%; margin-bottom: 30px"
+        @click.native.prevent="handleLogin"
+      >确认</el-button>
 
       <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
       </div> -->
-
     </el-form>
   </div>
 </template>
@@ -70,6 +82,8 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import { Message } from 'element-ui'
+import request from '@/utils/request'
+import { setToken } from '@/utils/auth'
 
 export default {
   name: 'Login',
@@ -131,11 +145,30 @@ export default {
         this.$refs.password.focus()
       })
     },
+    login(userInfo) {
+      const { site_id, username, password } = userInfo
+      return new Promise((resolve, reject) => {
+        request({
+          url: '/zz_admin/index/login',
+          method: 'post',
+          data: { uid: username.trim(), pwd: password, site_id: site_id }
+        }).then(data => {
+          console.log('***** login结果：', data)
+          this.$store.ycommit('SET_TOKEN', data.tokenAdmin)
+          this.$store.ycommit('set_auth_qr', data.auth_qr)
+          this.$store.ycommit('set_auth_id', data.auth_id)
+          setToken(data.tokenAdmin)
+          resolve(data)
+        }).catch(error => {
+          reject(error)
+        })
+      })
+    },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then((data) => {
+          this.login(this.loginForm).then((data) => {
             if (data.errcode !== 0) {
               Message({
                 message: data.errmsg || 'Error',
@@ -156,6 +189,31 @@ export default {
         }
       })
     }
+    // handleLogin() {
+    //   this.$refs.loginForm.validate(valid => {
+    //     if (valid) {
+    //       this.loading = true
+    //       this.$store.dispatch('user/login', this.loginForm).then((data) => {
+    //         if (data.errcode !== 0) {
+    //           Message({
+    //             message: data.errmsg || 'Error',
+    //             type: 'error',
+    //             duration: 5 * 1000
+    //           })
+    //         } else {
+    //           // this.$router.push({ path: this.redirect || '/' })
+    //           this.$router.push({ path: '/z_ui/a_admin/index_qr', query: { redirect: this.redirect }})
+    //         }
+    //         this.loading = false
+    //       }).catch(() => {
+    //         this.loading = false
+    //       })
+    //     } else {
+    //       console.log('error submit!!')
+    //       return false
+    //     }
+    //   })
+    // }
   }
 }
 </script>
@@ -164,8 +222,8 @@ export default {
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
 
-$bg:#283443;
-$light_gray:#fff;
+$bg: #283443;
+$light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -208,9 +266,9 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 
 .login-container {
   min-height: 100%;
