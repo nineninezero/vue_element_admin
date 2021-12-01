@@ -3,12 +3,12 @@ import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '@/utils/auth' // get token from cookie
+import { getToken, getToken_qr } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/z_ui/a_admin/index'] // no redirect whitelist
+const whiteList = ['/z_ui/a_admin/index', '/z_ui/a_admin/index_qr'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
   // console.log('路由导航守卫：', to, from, next)
@@ -17,19 +17,18 @@ router.beforeEach(async(to, from, next) => {
   document.title = getPageTitle(to.meta.title)
 
   const hasToken = getToken()
+  const hasToken_qr = getToken_qr()
 
-  if (hasToken) {
-    console.log('存在token_login')
+  if (hasToken_qr) {
+    console.log('存在token_qr')
     if (to.path === '/z_ui/a_admin/index') {
+      // 自动跳首页
       next({ path: '/' })
       NProgress.done()
     } else {
-      if (to.path === '/z_ui/a_admin/index_qr') {
-        // 有token_login了可以去二维码页
-        next()
-        return
-      }
-      // （准备换成判断二维码token的）
+      next()
+      NProgress.done()
+
       // const hasGetUserInfo = store.getters.name
       // if (hasGetUserInfo) {
       //   next()
@@ -47,16 +46,20 @@ router.beforeEach(async(to, from, next) => {
       //     NProgress.done()
       //   }
       // }
-      next()
     }
   } else {
-    console.log('未有token_login')
-
+    console.log('未有token_qr')
     if (whiteList.indexOf(to.path) !== -1) {
       // 白名单直接跳
       next()
     } else {
-      next(`/z_ui/a_admin/index?redirect=${to.path}`)
+      if (hasToken) {
+        // 已登录，跳二维码页
+        next(`/z_ui/a_admin/index_qr?redirect=${to.path}`)
+      } else {
+      // 未登录，先去登录页
+        next(`/z_ui/a_admin/index?redirect=${to.path}`)
+      }
       NProgress.done()
     }
   }
