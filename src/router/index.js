@@ -46,6 +46,7 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
+    hidden: true,
     redirect: '/dashboard',
     children: [{
       path: 'dashboard',
@@ -54,10 +55,23 @@ export const constantRoutes = [
       meta: { title: 'Dashboard', icon: 'dashboard' }
     }]
   },
+  // {
+  //   path: '/',
+  //   component: Layout,
+  //   hidden: true,
+  //   redirect: '/z_center',
+  //   children: [{
+  //     path: 'z_center',
+  //     name: 'ZCenter',
+  //     component: () => import('@/views/z_center/index'),
+  //     meta: { title: 'ZCenter', icon: 'z_center' }
+  //   }]
+  // },
 
   {
     path: '/example',
     component: Layout,
+    hidden: true,
     redirect: '/example/table',
     name: 'Example',
     meta: { title: 'Example', icon: 'el-icon-s-help' },
@@ -80,6 +94,7 @@ export const constantRoutes = [
   {
     path: '/form',
     component: Layout,
+    hidden: true,
     children: [
       {
         path: 'index',
@@ -93,6 +108,7 @@ export const constantRoutes = [
   {
     path: '/nested',
     component: Layout,
+    hidden: true,
     redirect: '/nested/menu1',
     name: 'Nested',
     meta: {
@@ -152,6 +168,7 @@ export const constantRoutes = [
   {
     path: 'external-link',
     component: Layout,
+    hidden: true,
     children: [
       {
         path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
